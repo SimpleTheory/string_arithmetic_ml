@@ -15,10 +15,12 @@ int_size: int = 99
 
 # CONSTS
 max_unit_length = (
-                          ((len(str(int_size)) + 1) * 2) +  # 2 numbers
+                          ((len(str(int_size)) + 1) * 2) +  # 2 numbers (each number being 2 digits and a negative sign so 3 here)
                           3 +  # whitespace op whitespace
                           3  # second operator
                   ) * max_length - 3  # last doesnt have 2nd op
+# In practice max_unit_length = 117 with all other parameters at default values, but this is more dynamic
+
 operators = ['+', '-', '*', '/']
 function_times = {}
 
@@ -63,29 +65,12 @@ def generate() -> str:
 
 
 def solve(problem: str) -> int:
-    """
-    Solves the generated strings problem with order of operations by iteratively doing each operation in a group until
-    there is nothing left and returns the integer of the result.
-    EX:
-        4 + 4 * 4 // 4 - 4
-        A.
-            4 + 16 // 4 -4
-            4 + 4 - 4
-        B.
-            8 - 4
-            4
-    :param problem: String from generate()
-    :return: int of solution
-    """
     if re.search('[a-zA-Z]', problem):
         raise Exception('Words in mathematical eval, danger of hack.')
     return eval(problem.replace('/', '//'))
 
 
 def get_a_data() -> Sample:
-    """
-    :return: problem solution pair
-    """
     problem = generate()
     return Sample(problem, solve(problem))
 
@@ -171,5 +156,5 @@ default_save_path = master_dir('cache/dataset.json')
 # </editor-fold>
 
 
-if __name__ == '__main__':
-    save(generate_dataset(100000), master_dir('cache/dataset.json'))
+# if __name__ == '__main__':
+#     save(generate_dataset(100000), master_dir('cache/dataset.json'))
