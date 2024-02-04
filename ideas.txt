@@ -1,13 +1,15 @@
-Encoding
+Encoding:
     Simple
     Encode numbers as (sign log number)
     Encode independent segments as a sequences of PEMDAS operations like 2 + (4 / 2 * 8)
-Model Architecture
-    Potentially double up the layers such that they can potentially mimic a 2-step process that a person would follow for PEMDAS
-    Create a new layer? (Don't know what to exploit in order to do this)
-    Combine different combos of layers like having a 1D CNN -> an Attention Layer doing this could exploit a more logical process to estimate the logic
-Loss Function (Relative different encodings)
+
+Model Architecture:
+    - Potentially double up the layers such that they can potentially mimic a 2-step process that a person would follow for PEMDAS
+    - Create a new layer? (Don't know what to exploit in order to do this)
+    - Combine different combos of layers like having a 1D CNN -> an Attention Layer doing this could exploit a more logical process to estimate the logic
+
+Loss Function (Relative different encodings):
     - Regarding numbered encoding treat penalize each axis accordingly
-    (so that a correct answer with an opposite magnitude is still considered mostly correct)
+        so that a correct answer with an opposite magnitude is still considered mostly correct
     - Potentially bin the numbers by 15% such that it is partially correct up to 15% and not after to reduce
-    regression average sticking tendencies
+      regression average sticking tendencies
