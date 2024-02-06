@@ -10,6 +10,7 @@ from pathlib import Path
 @dataclass
 class StringDataset(Dataset):
     data: list[generator.Sample] = None  # Should be (arithmetic string, solution)
+    encoding_scheme: Callable[[str], Iterable[tuple[int, int]]] = generator.simple_encoder
 
     @classmethod
     def from_size(cls, size: int):
@@ -25,14 +26,14 @@ class StringDataset(Dataset):
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, index: int, encoding_scheme: Callable[[str], Iterable[tuple[int, int]]] = generator.encoder):
+    def __getitem__(self, index: int):
         """
         Logic to process and return a single sample. Make sure that the inputs of the first layer and your final output
         of your model line up with the correct sizes
         (size listed in encoding scheme used default is `generator.max_unit_length`, size of answer should be a scalar int)
         and dtype (torch.int, int) of the Dataset.
         """
-        sample: torch.Tensor = torch.tensor(encoding_scheme(self.data[index].problem), dtype=torch.int)
+        sample: torch.Tensor = torch.tensor(self.encoding_scheme(self.data[index].problem), dtype=torch.float)  # dtype= int no work sad
         solution: int = self.data[index].solution
         return sample, solution
 

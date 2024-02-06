@@ -1,12 +1,11 @@
-import os
 from collections import namedtuple
 import random
 import re
 import numpy as np
 from pathlib import Path
 import json
-
 from string_arithmetic_ml.prep.utility import master_dir
+
 
 # <editor-fold desc="Parameters">
 # PARAM:
@@ -14,12 +13,17 @@ max_length: int = 10
 int_size: int = 99
 
 # CONSTS
-max_unit_length = (
+simple_max_unit_length = (
                           ((len(str(int_size)) + 1) * 2) +  # 2 numbers (each number being 2 digits and a negative sign so 3 here)
                           3 +  # whitespace op whitespace
                           3  # second operator
                   ) * max_length - 3  # last doesnt have 2nd op
 # In practice max_unit_length = 117 with all other parameters at default values, but this is more dynamic
+
+number_encoded_max_unit_length = (  # ie: 2 + 2 + would result in 4 tokens
+    2  # 2 Numbers
+    + 2  # 2 operator
+) * max_length - 1  # last number has no trailing operator
 
 operators = ['+', '-', '*', '/']
 function_times = {}
@@ -97,8 +101,14 @@ encoder_map = {
     ' ': 0b1110,
 }
 
+def fill_vector(vector: list, to: int, fill_char):
+    from_ = len(vector)
+    space_thats_left = to - from_
+    for num in range(space_thats_left):
+        vector.append(fill_char if not hasattr(fill_char, '__call__') else fill_char(num, from_))
+    return vector
 
-def encoder(equation_expression: str) -> list[tuple[int, int]]:
+def simple_encoder(equation_expression: str) -> list[tuple[int, int]]:
     """
     Returns a hot encoded list (vector) with each character in the string being hot encoded by `encoder_map` as well as
     the character's position (encoded_char, position) and then pads the rest of the vector with these tuples but
@@ -107,13 +117,32 @@ def encoder(equation_expression: str) -> list[tuple[int, int]]:
     :return: [(encoded_char, position), ...]
     """
     result = [(encoder_map[char], index) for index, char in enumerate(equation_expression)]
-    last_index = result[-1][1]  # Fast cheat since we store the char index in the encoded sample at [1]
-    if last_index < max_unit_length:
-        space_thats_left = max_unit_length - last_index
-        for num in range(space_thats_left):
-            result.append((0b1111, last_index + num))
+    result = fill_vector(result, simple_max_unit_length, lambda from_, current_index: (0b1111, from_ + current_index))
     return result
 
+def integer_encoder_base10(integer: str):
+    is_negative = int(integer.startswith('-'))
+    if is_negative:
+        integer = integer[1:]
+    magnitude = len(integer) - 1
+    return is_negative, magnitude, int(integer) / 10**magnitude
+
+# [position x, is op 1234 no op is 0, 01 is direction, x is magnitude, 0-9 is value] filler space [pos,5,0,0,0]
+def number_based_encoder(equation_expression):
+    # TODO abstract this way too much hard coded in here
+    result = []
+    operator_map = {operator: index+1 for index, operator in enumerate(operators)}
+    equation_expression += ' '  # For the regex to work
+    for index, find in enumerate(re.finditer(r'([+\-*/])\s|\s?([\-0-9]+)\s', equation_expression)):
+        if find.group(1):
+            result.append([index, operator_map[find.group(1)], 0, 0, 0])
+        elif find.group(2):
+            result.append([index, 0, *integer_encoder_base10(find.group(2))])
+    return fill_vector(
+        result,
+        number_encoded_max_unit_length,
+        lambda starting_size, current_index: [starting_size + current_index, 5, 0, 0, 0]
+    )
 
 # </editor-fold>
 

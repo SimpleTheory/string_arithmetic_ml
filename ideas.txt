@@ -1,6 +1,6 @@
 Encoding:
     Simple
-    Encode numbers as (sign log number)
+    Encode numbers as (sign, exp of 10 or some other num, number) -> 57 -> (+, 1 (for 10), 5.7)
     Encode independent segments as a sequences of PEMDAS operations like 2 + (4 / 2 * 8)
 
 Model Architecture:
