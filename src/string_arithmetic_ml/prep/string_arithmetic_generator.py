@@ -9,8 +9,8 @@ from string_arithmetic_ml.prep.utility import master_dir
 
 # <editor-fold desc="Parameters">
 # PARAM:
-max_length: int = 10
-int_size: int = 99
+max_length: int = 1
+int_size: int = 9
 
 # CONSTS
 simple_max_unit_length = (
@@ -185,5 +185,5 @@ default_save_path = master_dir('cache/dataset.json')
 # </editor-fold>
 
 
-# if __name__ == '__main__':
-#     save(generate_dataset(100000), master_dir('cache/dataset.json'))
+if __name__ == '__main__':
+    save(generate_dataset(100), master_dir('cache/simple_dataset.json'))
