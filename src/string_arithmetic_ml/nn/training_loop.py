@@ -83,7 +83,7 @@ def save_model(model: torch.nn.Module, path):
     torch.save(model.state_dict(), path)
 
 def save_logic(args: Arguments, epoch):
-    if args.epochal_validation_mean_loss > args.best_validation_loss:
+    if args.epochal_validation_mean_loss < args.best_validation_loss:
         args.best_validation_loss = args.epochal_validation_mean_loss
         save_model(args.model, args.save_path)
 # </editor-fold>
@@ -91,7 +91,9 @@ def save_logic(args: Arguments, epoch):
 def loop(args: Arguments):
     for epoch in range(args.max_epochs):
         train(args, epoch)
+        print('train done')
         validate(args, epoch)
+        print('validate done')
         save_logic(args, epoch)
         args.epochal_update(args, epoch)
 

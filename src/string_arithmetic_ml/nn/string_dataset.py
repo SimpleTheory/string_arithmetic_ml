@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 from typing import Callable, Iterable
@@ -34,7 +35,7 @@ class StringDataset(Dataset):
         and dtype (torch.int, int) of the Dataset.
         """
         sample: torch.Tensor = torch.tensor(self.encoding_scheme(self.data[index].problem), dtype=torch.float)  # dtype= int no work sad
-        solution: int = self.data[index].solution
+        solution = torch.tensor(self.data[index].solution, dtype=torch.float)  # to make it work with floats
         return sample, solution
 
 def split_dataset(dataset, training: float = .75, validation: float = .15):

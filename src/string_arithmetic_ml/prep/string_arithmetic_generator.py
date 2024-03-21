@@ -186,4 +186,4 @@ default_save_path = master_dir('cache/dataset.json')
 
 
 if __name__ == '__main__':
-    save(generate_dataset(100), master_dir('cache/simple_dataset.json'))
+    save(generate_dataset(10000), master_dir('cache/simple_dataset.json'))
