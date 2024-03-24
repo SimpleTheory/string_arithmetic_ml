@@ -1,9 +1,5 @@
 import functools
 import torch
-from string_arithmetic_ml.prep.utility import master_dir
-
-default_model_save_path = master_dir('cache/model.pth')
-
 
 def no_grad(func):
     @functools.wraps(func)

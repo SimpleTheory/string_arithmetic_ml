@@ -8,16 +8,19 @@ from string_arithmetic_ml.nn.architectures.control.rnn import StringRNN
 from string_arithmetic_ml.nn.architectures.control.fcn import SimpleFCN
 import string_arithmetic_ml.nn.training_loop as loop
 from string_arithmetic_ml.prep.utility import master_dir
+import string_arithmetic_ml.nn.model_test_loop as test_loop
 
 # Define dataset and data loader
 training_set, testing_set, validation_set = data.split_dataset(
     data.StringDataset.from_json(master_dir('cache/simple_dataset.json')), .75, .15)
+default_model_save_path = master_dir('cache/model.pth')
+
 
 batch_size = 2 ** 4
 
-training_loader = DataLoader(testing_set, batch_size=batch_size, shuffle=True, drop_last=True)
+training_loader = DataLoader(training_set, batch_size=batch_size, shuffle=True, drop_last=True)
 testing_loader = DataLoader(testing_set, batch_size=batch_size, shuffle=True, drop_last=True)
-validation_loader = DataLoader(testing_set, batch_size=batch_size, shuffle=True, drop_last=True)
+validation_loader = DataLoader(validation_set, batch_size=batch_size, shuffle=True, drop_last=True)
 
 # Create the model
 model = SimpleFCN(batch_size)
@@ -38,10 +41,11 @@ if __name__ == '__main__':
         validation_set,
         training_loader,
         validation_loader,
-        200,
+        2000,
         string_arithmetic_ml.nn.nn_utility_funcs.default_model_save_path,
         epochal_update=lambda args, epoch: print(
-            f'For the epoch {epoch}, the accuracy was {args.epochal_validation_mean_loss}.'
-            f' Best so far was {args.best_validation_loss}')
+            f'For the epoch {epoch}, the lowest err was {args.epochal_validation_mean_loss}.'
+            f' Best so far was {args.best_validation_loss}'),
+        from_present_model=True
     )
     loop.loop(args)

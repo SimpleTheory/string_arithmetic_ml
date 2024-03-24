@@ -26,6 +26,7 @@ class Arguments:
     #   any other argument parameters that you want to update you may do so if you would like
     #   or if you would like a read-out per epoch you can put that here
     epochal_update: Callable[['Arguments', int], None] = update_schedulers
+    from_existing_model: bool = False
     schedulers: list[torch.optim.lr_scheduler.LRScheduler] = field(default_factory=lambda: [])
     best_validation_loss = 0
     kwargs: dict = field(default_factory=dict)
@@ -42,8 +43,13 @@ class Arguments:
     def __post_init__(self):
         self._epochal_validation_loss = 0
         self._epochal_num_of_batches_evaluated = 0
+        if self.from_existing_model:
+            self.model.load_state_dict(torch.load(self.save_path))
         self.model, self.optimizer, self.loss_function, self.schedulers = \
             batch_cuda(self.model, self.optimizer, self.loss_function, self.schedulers)
+        if self.from_existing_model:
+            validate(self, -1)
+            self.best_validation_loss = self.epochal_validation_mean_loss
 
     def start_training(self):
         self.model.train()
@@ -83,7 +89,7 @@ def save_model(model: torch.nn.Module, path):
     torch.save(model.state_dict(), path)
 
 def save_logic(args: Arguments, epoch):
-    if args.epochal_validation_mean_loss < args.best_validation_loss:
+    if args.epochal_validation_mean_loss < args.best_validation_loss or args.best_validation_loss == 0:
         args.best_validation_loss = args.epochal_validation_mean_loss
         save_model(args.model, args.save_path)
 # </editor-fold>
@@ -91,9 +97,7 @@ def save_logic(args: Arguments, epoch):
 def loop(args: Arguments):
     for epoch in range(args.max_epochs):
         train(args, epoch)
-        print('train done')
         validate(args, epoch)
-        print('validate done')
         save_logic(args, epoch)
         args.epochal_update(args, epoch)
 

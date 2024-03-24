@@ -25,7 +25,8 @@ number_encoded_max_unit_length = (  # ie: 2 + 2 + would result in 4 tokens
     + 2  # 2 operator
 ) * max_length - 1  # last number has no trailing operator
 
-operators = ['+', '-', '*', '/']
+# operators = ['+', '-', '*', '/']
+operators = ['+', '-']
 function_times = {}
 
 
@@ -33,7 +34,8 @@ function_times = {}
 
 
 # <editor-fold desc="Utility Functions">
-def coinflip(): return random.choice((True, False))
+# def coinflip(): return random.choice((True, False))
+def coinflip(): return False
 
 
 def random_operator(): return random.choice(operators)
@@ -186,4 +188,4 @@ default_save_path = master_dir('cache/dataset.json')
 
 
 if __name__ == '__main__':
-    save(generate_dataset(10000), master_dir('cache/simple_dataset.json'))
+    save(generate_dataset(1000), master_dir('cache/simple_dataset.json'))
