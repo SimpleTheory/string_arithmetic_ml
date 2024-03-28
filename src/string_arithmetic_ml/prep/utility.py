@@ -6,6 +6,7 @@ def master_dir(join_with='', escape_sequence='/', project_name='string_arithmeti
     result = Path(str_master_dir(join_with, escape_sequence, project_name))
     if not result.parent.exists():
         result.mkdir(parents=True, exist_ok=True)
+    return result
 
 
 def str_master_dir(join_with='', escape_sequence='/', project_name='string_arithmetic_ml'):
