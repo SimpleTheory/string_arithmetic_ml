@@ -3,7 +3,9 @@ from pathlib import Path
 
 
 def master_dir(join_with='', escape_sequence='/', project_name='string_arithmetic_ml'):
-    return Path(str_master_dir(join_with, escape_sequence, project_name))
+    result = Path(str_master_dir(join_with, escape_sequence, project_name))
+    if not result.parent.exists():
+        result.mkdir(parents=True, exist_ok=True)
 
 
 def str_master_dir(join_with='', escape_sequence='/', project_name='string_arithmetic_ml'):
