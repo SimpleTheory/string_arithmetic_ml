@@ -45,8 +45,9 @@ class Arguments:
         self._epochal_num_of_batches_evaluated = 0
         if self.from_existing_model:
             self.model.load_state_dict(torch.load(self.save_path))
-        self.model, self.optimizer, self.loss_function, self.schedulers = \
-            batch_cuda(self.model, self.optimizer, self.loss_function, self.schedulers)
+        # self.model, self.optimizer, self.loss_function, self.schedulers = \
+        #     batch_cuda(self.model, self.optimizer, self.loss_function, self.schedulers)
+        self.model = cuda(self.model)
         if self.from_existing_model:
             validate(self, -1)
             self.best_validation_loss = self.epochal_validation_mean_loss

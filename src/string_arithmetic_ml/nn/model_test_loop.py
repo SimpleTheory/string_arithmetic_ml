@@ -40,7 +40,8 @@ class ModelLossTest:
         return cls(args.model if model is None else model, args.loss_function, test_set, test_loader)
 
     def __post_init__(self):
-        self.model, self.loss_function = batch_cuda(self.model, self.loss_function)
+        # self.model, self.loss_function = batch_cuda(self.model, self.loss_function)
+        self.model = cuda(self.model)
         self.loop_for_test()
 
     def loss_values(self):
