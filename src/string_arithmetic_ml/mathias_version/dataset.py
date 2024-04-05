@@ -45,7 +45,8 @@ class MathiasDatasetAllOperators(Dataset):
         result = np.empty((0, initial.shape[1] + 1),
                           dtype=np.float32)  # + 1 because its the size of the row from intial
         for vector in initial:
-            new = np.append(vector, np.float32(random.randint(0, 3)))
+            # new = np.append(vector, np.float32(random.randint(0, 3)))
+            new = np.append(vector, np.float32(3))
             result = np.vstack((result, new))
         return cls(torch.from_numpy(result))
 
@@ -83,9 +84,9 @@ if __name__ == '__main__':
     # MathiasDataset.from_size(10000).save()
     from string_arithmetic_ml.nn.string_dataset import split_dataset
 
-    mode = '_all_op_complex'
+    mode = '_division'
 
-    data = MathiasDatasetAllOperators.from_size(500)
+    data = MathiasDatasetAllOperators.from_size(1000)
     data.save()
     training_set, testing_set, validation_set = split_dataset(
         data, .75, .15)
